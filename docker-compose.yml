@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: sentinel_backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/sentinel.db:/app/sentinel.db # Persist DB
+
+  frontend:
+    build: ./frontend
+    container_name: sentinel_frontend
+    ports:
+      - "5173:80" # Map to 5173 so your testing URL stays the same
+    depends_on:
+      - backend
