@@ -11,16 +11,20 @@ SentinelAI is an advanced, AI-driven security platform that provides **continuou
 - **Continuous Monitoring**: Real-time WebSocket integration for live threat monitoring on the admin dashboard.
 - **Automated Threat Response**:
   - **Success**: Low risk scores allow standard access.
-  - **MFA Challenge**: Medium risk triggers step-up authentication.
-  - **Blocked**: High-risk anomalies (e.g., bot signatures, impossible travel) result in immediate session termination.
+  - **MFA Challenge**: Medium risk or high-value transactions (>= $1000) trigger step-up authentication.
+  - **Blocked**: High-risk anomalies (e.g., bot signatures, VPN/Proxy detection, impossible travel) result in immediate session termination.
+- **VPN & Proxy Detection**: Real-time IP intelligence integration to block access from known VPNs, Proxies, and Tor nodes.
+- **Continuous Session Monitoring**: Monitors for IP changes mid-session to prevent session hijacking and unauthorized VPN activation.
+- **Security Profiler**: Comprehensive client-side profiling of hardware (CPU cores, RAM) and high-resolution keystroke dynamics (Dwell Time) logged directly to the browser console.
 - **Impossible Travel Detection**: Geo-location analysis to detect logins from physically impossible locations in short timeframes.
-- **Attack Simulator**: Built-in tool to simulate various attack vectors (Bot Scripts, Stolen Credentials, Geo-Spoofing) to test the engine's response.
+- **Attack Simulator**: Built-in tool to simulate various attack vectors (Bot Scripts, Stolen Credentials, Geo-Spoofing, VPN Simulation) to test the engine's response.
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### **Backend**
+
 - **FastAPI**: High-performance Python web framework.
 - **Scikit-Learn**: Machine learning library for the Isolation Forest model.
 - **SQLAlchemy**: ORM for session and behavioral data persistence.
@@ -28,6 +32,7 @@ SentinelAI is an advanced, AI-driven security platform that provides **continuou
 - **SQLite**: Local database for historical behavior tracking.
 
 ### **Frontend**
+
 - **React 19**: Modern UI library with functional components.
 - **Tailwind CSS v4**: CSS-first utility framework for premium, responsive UI.
 - **Framer Motion**: Smooth animations for the dashboard and simulator.
@@ -64,6 +69,7 @@ SentiAI/
 ## ⚙️ Setup & Installation
 
 ### **Prerequisites**
+
 - Python 3.10+
 - Node.js 18+
 - Docker & Docker Compose (Optional)
@@ -71,6 +77,7 @@ SentiAI/
 ### **Local Development Setup**
 
 #### 1. Backend Setup
+
 ```bash
 cd backend
 python -m venv venv
@@ -85,6 +92,7 @@ uvicorn main:app --reload
 ```
 
 #### 2. Frontend Setup
+
 ```bash
 cd frontend
 npm install
@@ -92,6 +100,7 @@ npm run dev
 ```
 
 ### **Running with Docker**
+
 ```bash
 docker-compose up --build
 ```
@@ -104,21 +113,25 @@ SentinelAI includes an **Attack Simulator** (located in the bottom-left of the f
 
 1. **Inject Bot Script**: Simulates a script with perfect, non-human timing.
 2. **Stolen Credentials**: Simulates a login where the password is correct but behavior deviates from the established profile.
-3. **Impossible Travel**: Simulates a geo-location jump that is physically impossible (e.g., login from USA, then 1 minute later from China).
+3. **Impossible Travel**: Simulates a geo-location jump that is physically impossible (e.g., login from USA, then 1 minute later from China). _Note: This button is only visible on the Login page._
+4. **VPN/Proxy Simulation**: Simulates a connection from a known VPN exit node to trigger immediate session blocking.
 
 ---
 
 ## 🔐 Environment Variables
 
 Create a `.env` file in the `backend/` directory:
+
 ```env
 ADMIN_USER=admin
 ADMIN_PASS=admin123
 JWT_SECRET=your_secret_key_here
 MODEL_PATH=models/isolation_forest.pkl
+IPINFO_TOKEN=your_ipinfo_token_here # Optional: Get free token at ipinfo.io
 ```
 
 ---
 
 ## 📜 License
+
 MIT License. Created for advanced security research and AI-driven threat detection.
