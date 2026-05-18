@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { getFingerprint } from "../utils/fingerprint";
 import OTPModal from "./OTPModal";
 
 export default function AttackSimulator() {
+  const location = useLocation();
   const [result, setResult] = useState(null);
   const [showOTP, setShowOTP] = useState(false);
   const [currentAttack, setCurrentAttack] = useState("");
@@ -98,12 +100,14 @@ export default function AttackSimulator() {
           >
             Stolen Credentials
           </button>
-          <button
-            onClick={() => triggerAttack("impossible_travel")}
-            className="w-full bg-gray-800 hover:bg-purple-900/40 border border-gray-700 text-white text-sm py-2 rounded"
-          >
-            Impossible Travel (Geo-Spoof)
-          </button>
+          {location.pathname === "/" && (
+            <button
+              onClick={() => triggerAttack("impossible_travel")}
+              className="w-full bg-gray-800 hover:bg-purple-900/40 border border-gray-700 text-white text-sm py-2 rounded"
+            >
+              Impossible Travel (Geo-Spoof)
+            </button>
+          )}
           <button
             onClick={() => triggerAttack("vpn_proxy")}
             className="w-full bg-gray-800 hover:bg-blue-900/40 border border-gray-700 text-white text-sm py-2 rounded"

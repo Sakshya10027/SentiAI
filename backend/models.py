@@ -24,6 +24,7 @@ class DeviceData(BaseModel):
     hardwareConcurrency: int
     os: Optional[str] = "Unknown"
     platform: Optional[str] = "Unknown"
+    deviceMemory: Optional[float] = None # <--- New field for memory profiling
 
 class LoginRequest(BaseModel):
     username: str

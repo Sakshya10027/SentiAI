@@ -28,6 +28,7 @@ export const getFingerprint = () => {
     screenResolution: `${window.screen.width}x${window.screen.height}`,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown",
     hardwareConcurrency: navigator.hardwareConcurrency || 0,
+    deviceMemory: navigator.deviceMemory || 0,
     os: getOS(),
     platform: navigator.platform || "unknown",
   };

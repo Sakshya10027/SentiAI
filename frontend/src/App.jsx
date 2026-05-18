@@ -1,10 +1,18 @@
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import BankDashboard from "./components/BankDashboard";
 import AttackSimulator from "./components/AttackSimulator";
+import { initSecurityProfiler } from "./utils/securityProfiler";
 
 function App() {
+  useEffect(() => {
+    // Initialize global security profiling
+    const cleanup = initSecurityProfiler();
+    return cleanup;
+  }, []);
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-950 text-white relative">
