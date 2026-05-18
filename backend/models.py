@@ -22,6 +22,8 @@ class DeviceData(BaseModel):
     screenResolution: str
     timezone: str
     hardwareConcurrency: int
+    os: Optional[str] = "Unknown"
+    platform: Optional[str] = "Unknown"
 
 class LoginRequest(BaseModel):
     username: str
@@ -34,3 +36,11 @@ class LoginResponse(BaseModel):
     status: str
     message: str
     token: Optional[str] = None
+
+class TransferRequest(BaseModel):
+    username: str
+    recipient: str
+    amount: float
+    behavior: Optional[BehaviorData] = None
+    device: Optional[DeviceData] = None
+    ip_address: Optional[str] = None # <--- Added for testing/simulation

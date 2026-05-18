@@ -4,12 +4,14 @@ import axios from "axios";
 import { typingTracker, mouseTracker } from "../utils/behavior";
 import { getFingerprint } from "../utils/fingerprint";
 import OTPModal from "./OTPModal";
+import ImpossibleLocationOverlay from "./ImpossibleLocationOverlay";
 
-export default function Login() {
+export default function Login({ onSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState({ type: "", message: "" });
   const [showOTP, setShowOTP] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -35,14 +37,25 @@ export default function Login() {
       } else {
         setStatus({
           type: "success",
-          message: `Success! Token: ${response.data.token}`,
+          message: `Success! Authenticated securely.`,
         });
+        // Redirect after a short delay to show success message
+        setTimeout(() => {
+          if (onSuccess) onSuccess();
+        }, 1500);
       }
     } catch (error) {
-      setStatus({
-        type: "error",
-        message: error.response?.data?.detail || "Authentication failed",
-      });
+      if (
+        error.response?.status === 403 &&
+        error.response.data.detail.includes("Impossible location")
+      ) {
+        setIsBlocked(true);
+      } else {
+        setStatus({
+          type: "error",
+          message: error.response?.data?.detail || "Authentication failed",
+        });
+      }
     }
   };
 
@@ -51,8 +64,11 @@ export default function Login() {
       setShowOTP(false);
       setStatus({
         type: "success",
-        message: "MFA Verified! Session authenticated securely.",
+        message: "MFA Verified! Redirecting...",
       });
+      setTimeout(() => {
+        if (onSuccess) onSuccess();
+      }, 1500);
     } else {
       setShowOTP(false);
       setStatus({ type: "error", message: "Invalid OTP. Access Denied." });
@@ -65,6 +81,7 @@ export default function Login() {
       onMouseMove={(e) => mouseTracker.onMouseMove(e)}
       onClick={(e) => mouseTracker.onClick(e)}
     >
+      {isBlocked && <ImpossibleLocationOverlay />}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -93,11 +110,13 @@ export default function Login() {
               required
               onKeyDown={(e) => typingTracker.onKeyDown(e)}
               onKeyUp={(e) => typingTracker.onKeyUp(e)}
+              onPaste={(e) => typingTracker.onPaste(e)}
               className="w-full bg-gray-950 text-white border border-gray-700 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
+
           <div>
             <label className="block text-gray-400 text-sm font-medium mb-1">
               Password
@@ -107,6 +126,7 @@ export default function Login() {
               required
               onKeyDown={(e) => typingTracker.onKeyDown(e)}
               onKeyUp={(e) => typingTracker.onKeyUp(e)}
+              onPaste={(e) => typingTracker.onPaste(e)}
               className="w-full bg-gray-950 text-white border border-gray-700 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

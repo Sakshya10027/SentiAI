@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
-export default function OTPModal({ onVerify }) {
+export default function OTPModal({
+  onVerify,
+  title = "Adaptive MFA",
+  description = "Security anomaly detected. Enter the 6-digit OTP sent to your registered phone number.",
+}) {
   const [otp, setOtp] = useState("");
 
   const handleSubmit = (e) => {
@@ -10,16 +14,14 @@ export default function OTPModal({ onVerify }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-gray-900 p-8 rounded-xl border border-gray-700 max-w-sm w-full text-center shadow-2xl"
       >
-        <h3 className="text-xl font-bold text-white mb-2">Adaptive MFA</h3>
-        <p className="text-gray-400 text-sm mb-6">
-          Suspicious behavior detected. Enter 6-digit OTP to verify.
-        </p>
+        <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+        <p className="text-gray-400 text-sm mb-6">{description}</p>
 
         <form onSubmit={handleSubmit}>
           <input

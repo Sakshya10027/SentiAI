@@ -21,6 +21,10 @@ export class TypingTracker {
     delete this.keys[e.key];
   }
 
+  onPaste(e) {
+    this.metrics.push({ type: "paste", timestamp: Date.now() });
+  }
+
   getData() {
     return this.metrics;
   }
