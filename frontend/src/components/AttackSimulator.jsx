@@ -36,10 +36,10 @@ export default function AttackSimulator() {
     } else if (attackType === "impossible_travel") {
       payload.behavior.typing = [{ type: "keyup", dwellTime: 120 }];
       payload.behavior.mouse = [{ type: "move", x: 10, y: 10, timeDiff: 50 }];
-      payload.ip_address = "220.181.38.148"; // Beijing IP
+      payload.ip_address = "220.181.38.148";
     } else if (attackType === "vpn_proxy") {
       payload.behavior.typing = [{ type: "keyup", dwellTime: 120 }];
-      payload.ip_address = "185.242.226.21"; // Known M247 VPN Exit Node
+      payload.ip_address = "185.242.226.21";
     }
 
     try {
@@ -48,11 +48,9 @@ export default function AttackSimulator() {
         payload,
       );
 
-      // ALWAYS show OTP for simulator as requested by user
       setShowOTP(true);
       setResult({ type: "warning", text: response.data.message });
     } catch (error) {
-      // Even if blocked (403), show the OTP challenge for the simulation flow
       setShowOTP(true);
 
       if (error.response?.status === 403) {

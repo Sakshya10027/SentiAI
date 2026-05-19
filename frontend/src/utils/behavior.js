@@ -40,7 +40,6 @@ export class MouseTracker {
   onMouseMove(e) {
     const now = Date.now();
     const timeDiff = now - this.lastMove;
-    // Throttle to capture every ~50ms
     if (timeDiff > 50) {
       this.metrics.push({ type: "move", x: e.clientX, y: e.clientY, timeDiff });
       this.lastMove = now;

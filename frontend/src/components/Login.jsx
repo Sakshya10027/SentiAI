@@ -27,7 +27,7 @@ export default function Login({ onSuccess }) {
             typing: typingTracker.getData(),
             mouse: mouseTracker.getData(),
           },
-          device: getFingerprint(), // <--- Added device fingerprinting
+          device: getFingerprint(),
         },
       );
 
@@ -39,7 +39,6 @@ export default function Login({ onSuccess }) {
           type: "success",
           message: `Success! Authenticated securely.`,
         });
-        // Redirect after a short delay to show success message
         setTimeout(() => {
           if (onSuccess) onSuccess();
         }, 1500);

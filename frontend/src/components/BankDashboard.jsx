@@ -22,7 +22,6 @@ export default function BankDashboard({ onLogout }) {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [isBlocked, setIsBlocked] = useState(false);
 
-  // --- Continuous Session Monitoring ---
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -31,7 +30,6 @@ export default function BankDashboard({ onLogout }) {
         );
         if (response.data.status === "blocked") {
           setIsBlocked(true);
-          // Destroy token (if stored in localStorage/cookies)
           localStorage.removeItem("token");
         }
       } catch (error) {
@@ -42,10 +40,8 @@ export default function BankDashboard({ onLogout }) {
       }
     };
 
-    // Initial check
     checkSession();
 
-    // Poll every 30 seconds
     const interval = setInterval(checkSession, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -115,7 +111,6 @@ export default function BankDashboard({ onLogout }) {
     <div className="min-h-screen bg-gray-950 text-white font-sans p-4 md:p-8">
       {isBlocked && <ImpossibleLocationOverlay />}
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -133,7 +128,6 @@ export default function BankDashboard({ onLogout }) {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Balance Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -175,7 +169,6 @@ export default function BankDashboard({ onLogout }) {
               </div>
             </div>
 
-            {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800">
                 <TrendingUp className="text-green-500 mb-2" />
@@ -200,7 +193,6 @@ export default function BankDashboard({ onLogout }) {
               </div>
             </div>
 
-            {/* Transactions List */}
             <div className="bg-gray-900 rounded-3xl border border-gray-800 overflow-hidden">
               <div className="p-6 border-b border-gray-800 flex justify-between items-center">
                 <h3 className="font-bold flex items-center gap-2">
@@ -246,13 +238,11 @@ export default function BankDashboard({ onLogout }) {
             </div>
           </motion.div>
 
-          {/* Sidebar */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             className="space-y-8"
           >
-            {/* Card Widget */}
             <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800">
               <h3 className="font-bold mb-4 flex items-center gap-2">
                 <CreditCard size={20} /> My Cards
@@ -285,7 +275,6 @@ export default function BankDashboard({ onLogout }) {
               </button>
             </div>
 
-            {/* Security Notice */}
             <div className="bg-blue-600/10 p-6 rounded-3xl border border-blue-500/20">
               <ShieldCheck className="text-blue-500 mb-3" />
               <h4 className="font-bold mb-2">Security Active</h4>

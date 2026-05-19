@@ -38,7 +38,7 @@ export default function Dashboard() {
         ...data,
         time: new Date().toLocaleTimeString(),
       };
-      setAlerts((prev) => [newAlert, ...prev].slice(0, 50)); // Keep last 50 alerts
+      setAlerts((prev) => [newAlert, ...prev].slice(0, 50));
     };
     return () => ws.close();
   }, []);
@@ -46,7 +46,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100 p-8 font-sans selection:bg-blue-500/30">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
         <header className="flex justify-between items-center pb-6 border-b border-gray-800">
           <div className="flex items-center gap-3">
             <ShieldCheck className="w-10 h-10 text-blue-500" />
@@ -59,7 +58,6 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
@@ -104,7 +102,6 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Charts & Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-gray-900/50 p-6 rounded-2xl border border-gray-800 backdrop-blur-sm shadow-xl h-[450px]">
             <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
@@ -151,8 +148,7 @@ export default function Dashboard() {
 
           <div className="bg-gray-900/50 p-6 rounded-2xl border border-gray-800 backdrop-blur-sm shadow-xl overflow-y-auto h-[450px] relative">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2 sticky top-0 bg-gray-900/90 py-2 z-10">
-              <ShieldAlert className="w-5 h-5 text-red-500" /> Live Threat
-              Stream
+              <ShieldAlert className="w-5 h-5 text-red-500" /> Live Threat Stream
             </h3>
             {alerts.length === 0 ? (
               <div className="flex h-full items-center justify-center">
@@ -179,7 +175,7 @@ export default function Dashboard() {
                   <p className="text-red-400 text-sm font-semibold mb-3">
                     {alert.type}
                   </p>
-                  <div className="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                  <div className="full bg-gray-800 rounded-full h-1.5 overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${alert.risk}%` }}

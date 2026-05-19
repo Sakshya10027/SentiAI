@@ -10,7 +10,7 @@ class BehavioralSession(Base):
     typing_data = Column(JSON)
     mouse_data = Column(JSON)
     device_data = Column(JSON)
-    geo_data = Column(JSON) # <--- New column
+    geo_data = Column(JSON)
 
 class BehaviorData(BaseModel):
     typing: List[Dict[str, Any]]
@@ -24,14 +24,14 @@ class DeviceData(BaseModel):
     hardwareConcurrency: int
     os: Optional[str] = "Unknown"
     platform: Optional[str] = "Unknown"
-    deviceMemory: Optional[float] = None # <--- New field for memory profiling
+    deviceMemory: Optional[float] = None
 
 class LoginRequest(BaseModel):
     username: str
     password: str
     behavior: Optional[BehaviorData] = None
     device: Optional[DeviceData] = None
-    ip_address: Optional[str] = None # <--- For simulating external IPs
+    ip_address: Optional[str] = None
     
 class LoginResponse(BaseModel):
     status: str
@@ -44,4 +44,4 @@ class TransferRequest(BaseModel):
     amount: float
     behavior: Optional[BehaviorData] = None
     device: Optional[DeviceData] = None
-    ip_address: Optional[str] = None # <--- Added for testing/simulation
+    ip_address: Optional[str] = None

@@ -13,16 +13,10 @@ from config import settings
 router = APIRouter()
 
 def check_ip_security(ip: str) -> dict:
-    """
-    Checks if an IP is a VPN, Proxy, or Tor node using ipinfo.io.
-    Returns a dict with 'is_secure' (bool) and 'detail' (str).
-    """
     if ip in ["127.0.0.1", "localhost", "::1"]:
         return {"is_secure": True, "detail": "Localhost"}
 
-    try:
-        # Use ipinfo.io for VPN detection (requires privacy token for full VPN details, 
-        # but basic version still gives company/type info)
+    try: 
         token = settings.IPINFO_TOKEN
         url = f"https://ipinfo.io/{ip}/json"
         if token:
@@ -30,8 +24,6 @@ def check_ip_security(ip: str) -> dict:
         
         response = requests.get(url, timeout=5).json()
         
-        # Privacy detection logic (for free tier, we look at 'org' or 'hostname' 
-        # as indicators if privacy field is missing)
         is_vpn = False
         reason = "Clean IP"
 
@@ -40,7 +32,6 @@ def check_ip_security(ip: str) -> dict:
             is_vpn = True
             reason = "VPN/Proxy detected"
         
-        # Heuristic for free tier (looking for common data center keywords in org)
         org = response.get("org", "").lower()
         if not is_vpn and any(kw in org for kw in ["amazon", "google", "digitalocean", "linode", "m247", "ovh", "hosting", "datacenter"]):
             is_vpn = True
@@ -59,7 +50,6 @@ def get_risk_score(behavior_data: dict, device_data: dict, geo_data: dict) -> fl
     
     country = geo_data.get("country")
     if country and country not in ["United States", "Local"]:
-        # Reduced penalty from 85 to 30 so it doesn't trigger MFA by itself
         base_score += 30.0
 
     if device_data and "HeadlessChrome" in device_data.get("userAgent", ""):
@@ -68,32 +58,25 @@ def get_risk_score(behavior_data: dict, device_data: dict, geo_data: dict) -> fl
     if behavior_data:
         features_dict = extract_features(behavior_data)
         
-        # 1. Copy-Paste Detection
         if features_dict.get("is_paste") == 1.0:
             print("DEBUG: Copy-paste detected!")
-            base_score += 65.0  # Immediately triggers MFA (threshold 60)
+            base_score += 65.0  
 
-        # 2. Speed Anomaly Detection
         avg_dwell = features_dict.get("avg_dwell", 0)
         avg_flight = features_dict.get("avg_flight", 0)
         min_flight = features_dict.get("min_flight", 0)
         
-        # Very Fast (Robotic or very fast human)
-        # Increased thresholds: humans rarely average below 120ms flight time during passwords
         if (0 < avg_dwell < 60) or (0 < avg_flight < 110) or (0 < min_flight < 50):
             print(f"DEBUG: Fast speed detected! Dwell: {avg_dwell:.2f}, Flight: {avg_flight:.2f}, Min Flight: {min_flight:.2f}")
             base_score += 70.0
             
-        # Very Slow (Suspicious)
         if avg_dwell > 500 or avg_flight > 1000:
             print(f"DEBUG: Suspiciously slow speed detected! Dwell: {avg_dwell}, Flight: {avg_flight}")
             base_score += 65.0
 
-        # 3. Machine Learning Anomaly Detection
         if os.path.exists(settings.MODEL_PATH):
             try:
                 model = joblib.load(settings.MODEL_PATH)
-                # Use the standard 4 features for the model
                 ml_features = [
                     features_dict["avg_dwell"],
                     features_dict["avg_flight"],
@@ -111,11 +94,9 @@ def get_risk_score(behavior_data: dict, device_data: dict, geo_data: dict) -> fl
 async def notify_dashboard(alert_data: dict):
     await manager.broadcast(alert_data)
 
-
 @router.post("/transfer")
 async def transfer(req_body: TransferRequest, req: Request):
     client_ip = req_body.ip_address or req.client.host
-    # Check for VPN mid-session
     ip_check = check_ip_security(client_ip)
     if not ip_check["is_secure"]:
         await notify_dashboard({
@@ -134,17 +115,13 @@ async def transfer(req_body: TransferRequest, req: Request):
     
     risk_score = get_risk_score(behavior_dict, device_dict, {"country": "Local"})
     
-    # 1. Large Amount Check (Rule: >= $1000 requires OTP)
     is_large_amount = req_body.amount >= 1000
     
-    # 2. Behavioral Checks (Speed Anomaly)
     features = extract_features(behavior_dict)
     avg_dwell = features.get("avg_dwell", 0)
     avg_flight = features.get("avg_flight", 0)
     
-    # Robotic/Fast
     is_robotic = (0 < avg_dwell < 60) or (0 < avg_flight < 110)
-    # Suspiciously Slow
     is_slow = (avg_dwell > 500) or (avg_flight > 1000)
 
     if is_robotic or is_slow:
@@ -167,14 +144,11 @@ async def transfer(req_body: TransferRequest, req: Request):
 
 @router.post("/login", response_model=LoginResponse)
 async def login(req_body: LoginRequest, req: Request, db: Session = Depends(get_db)):
-    
-    # FIXED: Validate against environment variables
     if req_body.username != settings.ADMIN_USER or req_body.password != settings.ADMIN_PASS:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     client_ip = req_body.ip_address or req.client.host
     
-    # VPN/Proxy Check at Login
     ip_check = check_ip_security(client_ip)
     if not ip_check["is_secure"]:
         await notify_dashboard({
@@ -218,15 +192,10 @@ async def login(req_body: LoginRequest, req: Request, db: Session = Depends(get_
     elif risk_score > 60:
         return LoginResponse(status="mfa_required", message="Suspicious behavior detected. Please verify OTP.", token=None)
     
-    # FIXED: Issue the secret token from environment variables
     return LoginResponse(status="success", message="Authenticated successfully.", token=settings.JWT_SECRET)
 
 @router.get("/verify-session")
 async def verify_session(req: Request):
-    """
-    Continuous session monitoring endpoint.
-    Called by frontend to ensure current IP is still secure.
-    """
     client_ip = req.client.host
     ip_check = check_ip_security(client_ip)
     

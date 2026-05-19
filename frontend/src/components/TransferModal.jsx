@@ -18,7 +18,7 @@ export default function TransferModal({ isOpen, onClose, onTransferSuccess, onMf
 
     try {
       const response = await axios.post("http://localhost:8000/api/auth/transfer", {
-        username: "admin", // Hardcoded for demo
+        username: "admin",
         recipient,
         amount: parseFloat(amount),
         behavior: {

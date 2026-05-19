@@ -1,10 +1,4 @@
-/**
- * SentinelAI Security Profiler
- * Implements Device Fingerprinting and Keystroke Biometrics
- */
-
 export const initSecurityProfiler = () => {
-  // 1. Device Profiling (On Load)
   const getOS = () => {
     const { userAgent, platform } = window.navigator;
     if (/Mac/.test(platform)) return "Mac OS";
@@ -27,14 +21,10 @@ export const initSecurityProfiler = () => {
   console.log("%c[Security Profiler] Device Profile Captured:", "color: #3b82f6; font-weight: bold;");
   console.table(deviceProfile);
 
-  // 2. Keystroke Dynamics Tracking
   const keyTimestamps = new Map();
 
   const handleKeyDown = (e) => {
-    // Prevent recording duplicate keydown events when holding a key
     if (e.repeat) return;
-    
-    // Capture high-resolution timestamp (ms)
     keyTimestamps.set(e.key, performance.now());
   };
 
@@ -42,29 +32,24 @@ export const initSecurityProfiler = () => {
     const downTimestamp = keyTimestamps.get(e.key);
     
     if (downTimestamp) {
-      // Calculate Dwell Time (Up - Down)
       const dwellTime = Math.round(performance.now() - downTimestamp);
       
-      // 3. Clean Console Output Formatting
       console.log(
         `%c[Keystroke]%c Key: %c"${e.key}"%c | Dwell Time: %c${dwellTime}ms`,
-        "color: #ef4444; font-weight: bold;", // [Keystroke]
-        "color: #9ca3af;",                    // Key:
-        "color: #ffffff; font-weight: bold;", // "A"
-        "color: #9ca3af;",                    // |
-        "color: #10b981; font-weight: bold;"  // 85ms
+        "color: #ef4444; font-weight: bold;",
+        "color: #9ca3af;",
+        "color: #ffffff; font-weight: bold;",
+        "color: #9ca3af;",
+        "color: #10b981; font-weight: bold;"
       );
       
-      // Clear timestamp to avoid memory leaks
       keyTimestamps.delete(e.key);
     }
   };
 
-  // Attach global listeners
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
 
-  // Return cleanup function for React
   return () => {
     window.removeEventListener("keydown", handleKeyDown);
     window.removeEventListener("keyup", handleKeyUp);
